@@ -15,3 +15,7 @@ source build.tcl
 Save the HDL sources in `src/hdl`.
 
 When you edit the project structure, go to `File > Project > Write Tcl...`, uncheck all the checkboxes and save the new `build.tcl`.
+
+More info:
+- https://www.fpgadeveloper.com/2014/08/version-control-for-vivado-projects.html/
+- http://xillybus.com/tutorials/vivado-version-control-packaging
