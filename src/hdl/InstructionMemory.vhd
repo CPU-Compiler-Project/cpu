@@ -24,7 +24,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
@@ -39,7 +39,15 @@ end InstructionMemory;
 
 architecture Behavioral of InstructionMemory is
 
-begin
+type tabType is array(63 downto 0) of STD_LOGIC_VECTOR (7 downto 0);
+signal instructionMem: tabType := (others=>(others=>'0')) ;
 
+begin
+    process(CLK) is
+    begin
+        if rising_edge(CLK) then
+            OUTPUT <= instructionMem(to_integer(unsigned(ADDR)));
+        end if;
+    end process;
 
 end Behavioral;

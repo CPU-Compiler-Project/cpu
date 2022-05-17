@@ -60,9 +60,6 @@ begin
         end if;
     end process;
     
-    process
-    begin
-        QA <= tab(to_integer(unsigned(aA)));
-        QB <= tab(to_integer(unsigned(aB)));
-    end process;
+    QA <= tab(to_integer(unsigned(aA))); -- BYPASS !!!!
+    QB <= tab(to_integer(unsigned(aB))) when W = '0' or aB /= aW else DATA;
 end Behavioral;
