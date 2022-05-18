@@ -45,6 +45,14 @@ signal out_rbB : STD_LOGIC_VECTOR (7 downto 0);
 signal out_ualS : STD_LOGIC_VECTOR (7 downto 0);
 signal out_msOUT : STD_LOGIC_VECTOR (7 downto 0);
 
+signal out_LC_1 : STD_LOGIC;
+signal out_LC_2 : STD_LOGIC;
+signal out_LC_3 : STD_LOGIC_VECTOR (2 downto 0);
+signal out_MUX_1 : STD_LOGIC_VECTOR (7 downto 0);
+signal out_MUX_2 : STD_LOGIC_VECTOR (7 downto 0);
+signal out_MUX_3 : STD_LOGIC_VECTOR (7 downto 0);
+signal out_MUX_4 : STD_LOGIC_VECTOR (7 downto 0);
+
 component InstructionMemory
     generic ( IM_ADDR : STD_LOGIC_VECTOR := X"01");
     port ( IM_CLK : in STD_LOGIC;
@@ -93,11 +101,11 @@ signal DI_B : STD_LOGIC_VECTOR (3 downto 0);
 signal DI_A : STD_LOGIC_VECTOR (7 downto 0);
 signal DI_OP : STD_LOGIC_VECTOR (15 downto 0);
 
-signal EX_B : STD_LOGIC_VECTOR (3 downto 0);
+signal EX_B : STD_LOGIC_VECTOR (7 downto 0);
 signal EX_A : STD_LOGIC_VECTOR (7 downto 0);
 signal EX_OP : STD_LOGIC_VECTOR (15 downto 0);
 
-signal MEM_B : STD_LOGIC_VECTOR (3 downto 0);
+signal MEM_B : STD_LOGIC_VECTOR (7 downto 0);
 signal MEM_A : STD_LOGIC_VECTOR (7 downto 0);
 signal MEM_OP : STD_LOGIC_VECTOR (15 downto 0);
 
@@ -111,7 +119,7 @@ begin
         port map ( RB_aA => LI_A,
                    RB_aB => LI_B,
                    RB_aW => MEM_A,
-                   RB_W => MEM_OP, -- manque LC !!!!!!!!!!!!!
+                   RB_W => out_LC_1,
                    RB_DATA => MEM_B,
                    RB_RST => RST,
                    RB_CLK => CLK,
@@ -121,30 +129,30 @@ begin
     PIPELINE_3: UAL
         port map ( UAL_A => DI_B,
                    UAL_B => DI_C,
-                   UAL_Ctrl_Alu => DI_OP, -- manque LC !!!!!!!!!!!!!
+                   UAL_Ctrl_Alu => out_LC_3,
                    UAL_S => out_ualS);
                    
     PIPELINE_4: MemorySlot
-        port map ( MS_ADDR => EX_B, -- manque le MUX !!!!!
+        port map ( MS_ADDR => out_MUX_2,
                    MS_INPUT => EX_B,
                    MS_RST => RST,
                    MS_CLK => CLK,
-                   MS_RW => EX_OP, -- manque LC !!!!!!!!!!!!!
+                   MS_RW => out_LC_2,
                    MS_OUTPUT => out_msOUT);
 
      process(CLK) is
      begin
         if rising_edge(CLK) then
             MEM_A <= EX_A; -- undefined at the beginning
-            MEM_B <= out_msOUT; -- manque le MUX !!!!! && undefined at the beginning
+            MEM_B <= out_MUX_1; -- undefined at the beginning
             MEM_OP <= EX_OP; -- undefined at the beginning
             
             EX_A <= DI_A;
-            EX_B <= out_ualS; -- manque le MUX !!!!!
+            EX_B <= out_MUX_3;
             EX_OP <= DI_OP;
             
             DI_A <= LI_A;
-            DI_B <= out_rbA; -- manque le MUX !!!!!
+            DI_B <= out_MUX_4;
             DI_C <= out_rbB;
             DI_OP <= LI_OP;
         
@@ -154,5 +162,23 @@ begin
             LI_OP <= out_im(31 downto 16);
         end if;
      end process;
-  
+     
+    out_LC_1 <= '1' when MEM_OP = X"0001" or MEM_OP = X"0002" -- ajouter les id des op
+           else '0';
+    out_MUX_1 <=  out_msOUT when EX_OP = X"0003" or EX_OP = X"0004" -- ajouter les id des op
+           else EX_B;
+    out_LC_2 <= '1' when EX_OP = X"0001" or EX_OP = X"0002" -- ajouter les id des op
+           else '0';
+    out_MUX_2 <= EX_A when EX_OP = X"0003" or EX_OP = X"0004" -- ajouter les id des op
+           else EX_B;
+    out_MUX_3 <= out_ualS when DI_OP = X"0003" or DI_OP = X"0004" -- ajouter les id des op
+           else DI_B;
+    out_LC_3 <= "01" when DI_OP = X"0001" -- ajouter les id des op
+           else "00" when DI_OP = X"0002"
+           else "11" when DI_OP = X"0004"
+           else "10" when DI_OP = X"0003";
+   out_MUX_4 <= out_rbA when LI_OP = X"0003" or LI_OP = X"0004" -- ajouter les id des op
+          else LI_B;
+    
+    
 end Behavioral;
