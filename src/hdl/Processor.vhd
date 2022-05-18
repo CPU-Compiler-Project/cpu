@@ -39,6 +39,8 @@ end Processor;
 
 architecture Behavioral of Processor is
 
+signal init_addr : STD_LOGIC_VECTOR (7 downto 0) := X"00";
+
 signal out_im : STD_LOGIC_VECTOR (31 downto 0);
 signal out_rbA : STD_LOGIC_VECTOR (7 downto 0);
 signal out_rbB : STD_LOGIC_VECTOR (7 downto 0);
@@ -53,92 +55,94 @@ signal out_MUX_2 : STD_LOGIC_VECTOR (7 downto 0);
 signal out_MUX_3 : STD_LOGIC_VECTOR (7 downto 0);
 signal out_MUX_4 : STD_LOGIC_VECTOR (7 downto 0);
 
-component InstructionMemory
-    generic ( IM_ADDR : STD_LOGIC_VECTOR := X"01");
-    port ( IM_CLK : in STD_LOGIC;
-           IM_OUTPUT : out STD_LOGIC_VECTOR (31 downto 0));
+component InstructionMemory is
+    Port ( ADDR : in STD_LOGIC_VECTOR (7 downto 0);
+           CLK : in STD_LOGIC;
+           OUTPUT : out STD_LOGIC_VECTOR (31 downto 0));
 end component;
 
+
 component RegisterBus
-    port ( RB_aA : in STD_LOGIC_VECTOR (3 downto 0);
-           RB_aB : in STD_LOGIC_VECTOR (3 downto 0);
-           RB_aW : in STD_LOGIC_VECTOR (3 downto 0);
-           RB_W : in STD_LOGIC;
-           RB_DATA : in STD_LOGIC_VECTOR (7 downto 0);
-           RB_RST : in STD_LOGIC;
-           RB_CLK : in STD_LOGIC;
-           RB_QA : out STD_LOGIC_VECTOR (7 downto 0);
-           RB_QB : out STD_LOGIC_VECTOR (7 downto 0));
+    port ( aA : in STD_LOGIC_VECTOR (3 downto 0);
+           aB : in STD_LOGIC_VECTOR (3 downto 0);
+           aW : in STD_LOGIC_VECTOR (3 downto 0);
+           W : in STD_LOGIC;
+           DATA : in STD_LOGIC_VECTOR (7 downto 0);
+           RST : in STD_LOGIC;
+           CLK : in STD_LOGIC;
+           QA : out STD_LOGIC_VECTOR (7 downto 0);
+           QB : out STD_LOGIC_VECTOR (7 downto 0));
 end component;
 
 component UAL
-    port ( UAL_A : in STD_LOGIC_VECTOR (7 downto 0);
-           UAL_B : in STD_LOGIC_VECTOR (7 downto 0);
-           UAL_Ctrl_Alu : in STD_LOGIC_VECTOR (2 downto 0);
-           UAL_N : out STD_LOGIC;
-           UAL_O : out STD_LOGIC;
-           UAL_C : out STD_LOGIC;
-           UAL_Z : out STD_LOGIC;
-           UAL_S : out STD_LOGIC_VECTOR (7 downto 0));
+    port ( A : in STD_LOGIC_VECTOR (7 downto 0);
+           B : in STD_LOGIC_VECTOR (7 downto 0);
+           Ctrl_Alu : in STD_LOGIC_VECTOR (2 downto 0);
+           N : out STD_LOGIC;
+           O : out STD_LOGIC;
+           C : out STD_LOGIC;
+           Z : out STD_LOGIC;
+           S : out STD_LOGIC_VECTOR (7 downto 0));
 end component;
 
 component MemorySlot
-    port (  MS_ADDR : in STD_LOGIC_VECTOR (7 downto 0);    
-            MS_INPUT : in STD_LOGIC_VECTOR (7 downto 0);   
-            MS_RW : in STD_LOGIC;                          
-            MS_RST : in STD_LOGIC;                         
-            MS_CLK : in STD_LOGIC;                         
-            MS_OUTPUT : out STD_LOGIC_VECTOR (7 downto 0));
+    port (  ADDR : in STD_LOGIC_VECTOR (7 downto 0);    
+            INPUT : in STD_LOGIC_VECTOR (7 downto 0);   
+            RW : in STD_LOGIC;                          
+            RST : in STD_LOGIC;                         
+            CLK : in STD_LOGIC;                         
+            OUTPUT : out STD_LOGIC_VECTOR (7 downto 0));
 end component;
 
-signal LI_C : STD_LOGIC_VECTOR (3 downto 0);
-signal LI_B : STD_LOGIC_VECTOR (3 downto 0);
+signal LI_C : STD_LOGIC_VECTOR (7 downto 0);
+signal LI_B : STD_LOGIC_VECTOR (7 downto 0);
 signal LI_A : STD_LOGIC_VECTOR (7 downto 0);
-signal LI_OP : STD_LOGIC_VECTOR (15 downto 0);
+signal LI_OP : STD_LOGIC_VECTOR (7 downto 0);
 
-signal DI_C : STD_LOGIC_VECTOR (3 downto 0);
-signal DI_B : STD_LOGIC_VECTOR (3 downto 0);
+signal DI_C : STD_LOGIC_VECTOR (7 downto 0);
+signal DI_B : STD_LOGIC_VECTOR (7 downto 0);
 signal DI_A : STD_LOGIC_VECTOR (7 downto 0);
-signal DI_OP : STD_LOGIC_VECTOR (15 downto 0);
+signal DI_OP : STD_LOGIC_VECTOR (7 downto 0);
 
 signal EX_B : STD_LOGIC_VECTOR (7 downto 0);
 signal EX_A : STD_LOGIC_VECTOR (7 downto 0);
-signal EX_OP : STD_LOGIC_VECTOR (15 downto 0);
+signal EX_OP : STD_LOGIC_VECTOR (7 downto 0);
 
 signal MEM_B : STD_LOGIC_VECTOR (7 downto 0);
 signal MEM_A : STD_LOGIC_VECTOR (7 downto 0);
-signal MEM_OP : STD_LOGIC_VECTOR (15 downto 0);
+signal MEM_OP : STD_LOGIC_VECTOR (7 downto 0);
 
 begin
 
     PIPELINE_1 : InstructionMemory
-        port map ( IM_CLK => CLK,
-                   IM_OUTPUT => out_im); 
+        port map ( ADDR => init_addr,
+                   CLK => CLK,
+                   OUTPUT => out_im); 
                    
     PIPELINE_2 : RegisterBus
-        port map ( RB_aA => LI_A,
-                   RB_aB => LI_B,
-                   RB_aW => MEM_A,
-                   RB_W => out_LC_1,
-                   RB_DATA => MEM_B,
-                   RB_RST => RST,
-                   RB_CLK => CLK,
-                   RB_QA => out_rbA,
-                   RB_QB => out_rbB);
+        port map ( aA => LI_A(3 downto 0),
+                   aB => LI_B(3 downto 0),
+                   aW => MEM_A(3 downto 0),
+                   W => out_LC_1,
+                   DATA => MEM_B,
+                   RST => RST,
+                   CLK => CLK,
+                   QA => out_rbA,
+                   QB => out_rbB);
                    
     PIPELINE_3: UAL
-        port map ( UAL_A => DI_B,
-                   UAL_B => DI_C,
-                   UAL_Ctrl_Alu => out_LC_3,
-                   UAL_S => out_ualS);
+        port map ( A => DI_B,
+                   B => DI_C,
+                   Ctrl_Alu => out_LC_3,
+                   S => out_ualS);
                    
     PIPELINE_4: MemorySlot
-        port map ( MS_ADDR => out_MUX_2,
-                   MS_INPUT => EX_B,
-                   MS_RST => RST,
-                   MS_CLK => CLK,
-                   MS_RW => out_LC_2,
-                   MS_OUTPUT => out_msOUT);
+        port map ( ADDR => out_MUX_2,
+                   INPUT => EX_B,
+                   RST => RST,
+                   CLK => CLK,
+                   RW => out_LC_2,
+                   OUTPUT => out_msOUT);
 
      process(CLK) is
      begin
@@ -156,28 +160,28 @@ begin
             DI_C <= out_rbB;
             DI_OP <= LI_OP;
         
-            LI_C <= out_im(3 downto 0);
-            LI_B <= out_im(7 downto 4);
-            LI_A <= out_im(15 downto 8);
-            LI_OP <= out_im(31 downto 16);
+            LI_C <= out_im(7 downto 0);
+            LI_B <= out_im(15 downto 8);
+            LI_A <= out_im(23 downto 16);
+            LI_OP <= out_im(31 downto 24);
         end if;
      end process;
      
-    out_LC_1 <= '1' when MEM_OP = X"0001" or MEM_OP = X"0002" -- ajouter les id des op
+    out_LC_1 <= '1' when MEM_OP = X"01" or MEM_OP = X"02" -- ajouter les id des op
            else '0';
-    out_MUX_1 <=  out_msOUT when EX_OP = X"0003" or EX_OP = X"0004" -- ajouter les id des op
+    out_MUX_1 <=  out_msOUT when EX_OP = X"0003" or EX_OP = X"04" -- ajouter les id des op
            else EX_B;
-    out_LC_2 <= '1' when EX_OP = X"0001" or EX_OP = X"0002" -- ajouter les id des op
+    out_LC_2 <= '1' when EX_OP = X"01" or EX_OP = X"02" -- ajouter les id des op
            else '0';
-    out_MUX_2 <= EX_A when EX_OP = X"0003" or EX_OP = X"0004" -- ajouter les id des op
+    out_MUX_2 <= EX_A when EX_OP = X"03" or EX_OP = X"04" -- ajouter les id des op
            else EX_B;
-    out_MUX_3 <= out_ualS when DI_OP = X"0003" or DI_OP = X"0004" -- ajouter les id des op
+    out_MUX_3 <= out_ualS when DI_OP = X"03" or DI_OP = X"04" -- ajouter les id des op
            else DI_B;
-    out_LC_3 <= "01" when DI_OP = X"0001" -- ajouter les id des op
-           else "00" when DI_OP = X"0002"
-           else "11" when DI_OP = X"0004"
-           else "10" when DI_OP = X"0003";
-   out_MUX_4 <= out_rbA when LI_OP = X"0003" or LI_OP = X"0004" -- ajouter les id des op
+    out_LC_3 <= "001" when DI_OP = X"01" -- ajouter les id des op
+           else "000" when DI_OP = X"02"
+           else "011" when DI_OP = X"04"
+           else "010" when DI_OP = X"03";
+   out_MUX_4 <= out_rbA when LI_OP = X"03" or LI_OP = X"04" -- ajouter les id des op
           else LI_B;
     
     

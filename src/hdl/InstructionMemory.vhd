@@ -39,7 +39,7 @@ end InstructionMemory;
 
 architecture Behavioral of InstructionMemory is
 
-type tabType is array(63 downto 0) of STD_LOGIC_VECTOR (7 downto 0);
+type tabType is array(63 downto 0) of STD_LOGIC_VECTOR (31 downto 0);
 signal instructionMem: tabType := (others=>(others=>'0')) ;
 
 begin
