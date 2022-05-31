@@ -4,7 +4,7 @@
 -- 
 -- Create Date: 18.05.2022 11:44:44
 -- Design Name: 
--- Module Name: TestCPU - Behavioral
+-- Module Name: ProcessorTest - Behavioral
 -- Project Name: 
 -- Target Devices: 
 -- Tool Versions: 
@@ -31,21 +31,21 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity TestCPU is
+entity ProcessorTest is
 --  Port ( );
-end TestCPU;
+end ProcessorTest;
 
-architecture Behavioral of TestCPU is
+architecture Behavioral of ProcessorTest is
 
 component Processor is
-    Port ( CLK : in STD_LOGIC;
-           RST : in STD_LOGIC;
-           OUTPUT : out STD_LOGIC);
+    Port ( IP_ADDR : in STD_LOGIC_VECTOR (7 downto 0);
+           CLK : in STD_LOGIC;
+           RST : in STD_LOGIC);
 end component;
 
 signal testCLK: STD_LOGIC := '0';
 signal testRST: STD_LOGIC := '1';
-signal testOUTPUT: STD_LOGIC;
+signal init_addr : STD_LOGIC_VECTOR (7 downto 0) := X"00";
 -- Clock period definitions
 -- Si 100 MHz
 constant Clock_period : time := 10 ns;
@@ -54,7 +54,7 @@ begin
 Label_uut: Processor PORT MAP(
     CLK => testCLK,
     RST => testRST,
-    OUTPUT => testOUTPUT 
+    IP_ADDR => init_addr 
 );
 
 Clock_process : process
@@ -63,7 +63,7 @@ begin
     wait for Clock_period/2;
 end process;
 
-testRST <= '0' after 20 ns;
+testRST <= '0' after 500 ns;
 
 end Behavioral;
 

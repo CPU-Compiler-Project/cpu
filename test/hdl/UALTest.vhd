@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date: 09.05.2022 13:08:51
+-- Create Date: 31.05.2022 15:34:19
 -- Design Name: 
--- Module Name: UAL - Behavioral
+-- Module Name: UALTest - Behavioral
 -- Project Name: 
 -- Target Devices: 
 -- Tool Versions: 
@@ -21,19 +21,23 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
-
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
-use IEEE.NUMERIC_STD.ALL;
+--use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity UAL is
+entity UALTest is
+--  Port ( );
+end UALTest;
+
+architecture Behavioral of UALTest is
+
+component UAL is
     Port ( A : in STD_LOGIC_VECTOR (7 downto 0);
            B : in STD_LOGIC_VECTOR (7 downto 0);
            Ctrl_Alu : in STD_LOGIC_VECTOR (2 downto 0);
@@ -42,33 +46,41 @@ entity UAL is
            C : out STD_LOGIC;
            Z : out STD_LOGIC;
            S : out STD_LOGIC_VECTOR (7 downto 0));
-end UAL;
+end component;
 
-architecture Behavioral of UAL is
-signal result : STD_LOGIC_VECTOR (15 downto 0) := (others => '0');
+signal testA: STD_LOGIC_VECTOR (7 downto 0) := (others => '0');
+signal testB: STD_LOGIC_VECTOR (7 downto 0) := (others => '0');
+signal testCtrl_Alu: STD_LOGIC_VECTOR (2 downto 0) := (others => '0');
+signal testN: STD_LOGIC;
+signal testO: STD_LOGIC;
+signal testC: STD_LOGIC;
+signal testZ: STD_LOGIC;
+signal testS: STD_LOGIC_VECTOR (7 downto 0);
+
+-- Clock period definitions
+-- Si 100 MHz
+constant Clock_period : time := 10 ns;
 
 begin
-    process(A, B, Ctrl_Alu)
-        begin
-            if Ctrl_Alu = "000" then  --Addition
-                result(8 downto 0) <= '0' & A + B ;
-                S <= result(7 downto 0);
-                C <= result(8);
-            elsif Ctrl_Alu = "001" then --Soustraction
-                S <= A - B ;
-                if B > A then
-                    N <= '1';
-                end if;
-            elsif Ctrl_Alu = "010" then --Multiplication
-                result <= A * B;
-                S <= result(7 downto 0);
-                if result > X"00FF" then 
-                    O <= '1';
-                end if;
-            end if;
-            if result = X"0000" then
-                Z <= '1';
-            end if;        
-        end process;
+
+Label_IM: UAL PORT MAP(
+    A => testA,
+    B => testB,
+    Ctrl_Alu => testCtrl_Alu,
+    N => testN,
+    O => testO,
+    C => testC,
+    Z => testZ,
+    S => testS 
+);
+
+Clock_process : process
+begin
+    wait for Clock_period/2;
+end process;
+
+testCtrl_Alu <= "000" after 100ns, "001" after 200ns, "010" after 300ns;
+testA <= X"23";
+testB <= X"43";
 
 end Behavioral;

@@ -32,14 +32,12 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity Processor is
-    Port ( CLK : in STD_LOGIC;
-           RST : in STD_LOGIC;
-           OUTPUT : out STD_LOGIC);
+    Port ( IP_ADDR : in STD_LOGIC_VECTOR (7 downto 0);
+           CLK : in STD_LOGIC;
+           RST : in STD_LOGIC);
 end Processor;
 
 architecture Behavioral of Processor is
-
-signal init_addr : STD_LOGIC_VECTOR (7 downto 0) := X"00";
 
 signal out_im : STD_LOGIC_VECTOR (31 downto 0);
 signal out_rbA : STD_LOGIC_VECTOR (7 downto 0);
@@ -115,7 +113,7 @@ signal MEM_OP : STD_LOGIC_VECTOR (7 downto 0);
 begin
 
     PIPELINE_1 : InstructionMemory
-        port map ( ADDR => init_addr,
+        port map ( ADDR => IP_ADDR,
                    CLK => CLK,
                    OUTPUT => out_im); 
                    
