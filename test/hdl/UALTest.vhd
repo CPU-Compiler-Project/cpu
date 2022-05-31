@@ -63,7 +63,7 @@ constant Clock_period : time := 10 ns;
 
 begin
 
-Label_IM: UAL PORT MAP(
+Label_UAL: UAL PORT MAP(
     A => testA,
     B => testB,
     Ctrl_Alu => testCtrl_Alu,

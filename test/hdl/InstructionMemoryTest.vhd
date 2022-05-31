@@ -31,13 +31,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity InstuctionMemoryTest is
+entity InstructionMemoryTest is
 --  Port ( );
-end InstuctionMemoryTest;
+end InstructionMemoryTest;
 
-architecture Behavioral of InstuctionMemoryTest is
+architecture Behavioral of InstructionMemoryTest is
 
-component InstuctionMemory is
+component InstructionMemory is
     Port ( ADDR : in STD_LOGIC_VECTOR (7 downto 0);
            CLK : in STD_LOGIC;
            OUTPUT : out STD_LOGIC_VECTOR (31 downto 0));
@@ -53,7 +53,7 @@ constant Clock_period : time := 10 ns;
 
 begin
 
-Label_IM: InstuctionMemory PORT MAP(
+Label_IM: InstructionMemory PORT MAP(
     ADDR => testADDR,
     CLK => testCLK,
     OUTPUT => testOUTPUT 
