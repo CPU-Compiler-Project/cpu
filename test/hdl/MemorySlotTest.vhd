@@ -74,10 +74,10 @@ begin
     wait for Clock_period/2;
 end process;
 
--- write 42 at @00000000
-testADDR <= "00000000" after 20 ns, "00000000" after 500 ns;
+-- write 42 at @0x00
+testADDR <= X"00" after 20 ns, X"00" after 500 ns;
 
--- read value at @00000000 (should be 42)
+-- read value at @0x00 (should be 42)
 testRW <= '1' after 20 ns, '0' after 500 ns;
 testINPUT <= X"2A" after 20 ns;
 

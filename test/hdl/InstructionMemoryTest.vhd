@@ -65,7 +65,7 @@ begin
     wait for Clock_period/2;
 end process;
 
-testADDR <= "00000000" after 20 ns, "00111111" after 400 ns; -- test the value at @0
--- then test the value at @63
+testADDR <= X"00" after 20 ns, X"FF" after 400 ns; -- test the value at @0x00
+-- then test the value at @0xFF
 
 end Behavioral;

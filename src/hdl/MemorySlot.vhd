@@ -42,7 +42,7 @@ end MemorySlot;
 
 architecture Behavioral of MemorySlot is
 
-type tabType is array(15 downto 0) of STD_LOGIC_VECTOR (7 downto 0);
+type tabType is array(255 downto 0) of STD_LOGIC_VECTOR (7 downto 0);
 signal dataMem: tabType := (others=>(others=>'0')) ;
 
 begin
