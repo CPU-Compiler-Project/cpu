@@ -165,22 +165,25 @@ begin
         end if;
      end process;
      
-    out_LC_1 <= '1' when MEM_OP = X"01" or MEM_OP = X"02" -- ajouter les id des op
-           else '0';
-    out_MUX_1 <=  out_msOUT when EX_OP = X"0003" or EX_OP = X"04" -- ajouter les id des op
+    out_LC_1 <= '0' when MEM_OP = X"08" -- STORE
+           else '1';
+    out_MUX_1 <= out_msOUT when EX_OP = X"07" -- LOAD
            else EX_B;
-    out_LC_2 <= '1' when EX_OP = X"01" or EX_OP = X"02" -- ajouter les id des op
-           else '0';
-    out_MUX_2 <= EX_A when EX_OP = X"03" or EX_OP = X"04" -- ajouter les id des op
-           else EX_B;
-    out_MUX_3 <= out_ualS when DI_OP = X"03" or DI_OP = X"04" -- ajouter les id des op
-           else DI_B;
-    out_LC_3 <= "001" when DI_OP = X"01" -- ajouter les id des op
-           else "000" when DI_OP = X"02"
-           else "011" when DI_OP = X"04"
-           else "010" when DI_OP = X"03";
-   out_MUX_4 <= out_rbA when LI_OP = X"03" or LI_OP = X"04" -- ajouter les id des op
-          else LI_B;
+    out_LC_2 <= '1' when EX_OP = X"07" -- LOAD
+           else '0' when EX_OP = X"08" -- STORE
+           else '1';
+    out_MUX_2 <= EX_B when EX_OP = X"07" -- LOAD
+           else EX_A when EX_OP = X"08" -- STORE
+           else X"00";
+    out_MUX_3 <= DI_B when DI_OP = X"06" -- AFC
+           or DI_OP = X"05" -- COP
+           else out_ualS;
+    out_LC_3 <= "000" when DI_OP = X"01" -- ADD
+           else "001" when DI_OP = X"02" -- MUL
+           else "010" when DI_OP = X"03" -- SOU
+           else "011" when DI_OP = X"04"; -- DIV
+   out_MUX_4 <= LI_B when LI_OP = X"06" -- AFC
+          else out_rbA;
     
     
 end Behavioral;

@@ -50,21 +50,22 @@ signal result : STD_LOGIC_VECTOR (15 downto 0) := (others => '0');
 begin
     process(A, B, Ctrl_Alu)
         begin
-            if Ctrl_Alu = "000" then  --Addition
+            if Ctrl_Alu = "000" then  -- Addition
                 result(8 downto 0) <= '0' & A + B ;
                 S <= result(7 downto 0);
                 C <= result(8);
-            elsif Ctrl_Alu = "001" then --Soustraction
-                S <= A - B ;
-                if B > A then
-                    N <= '1';
-                end if;
-            elsif Ctrl_Alu = "010" then --Multiplication
+            elsif Ctrl_Alu = "001" then -- Multiplication
                 result <= A * B;
                 S <= result(7 downto 0);
                 if result > X"00FF" then 
                     O <= '1';
                 end if;
+            elsif Ctrl_Alu = "010" then -- Soustraction
+                S <= A - B ;
+                if B > A then
+                    N <= '1';
+                end if;
+            elsif Ctrl_Alu = "011" then -- Division
             end if;
             if result = X"0000" then
                 Z <= '1';

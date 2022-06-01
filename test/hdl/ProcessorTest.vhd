@@ -24,7 +24,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
@@ -45,25 +45,41 @@ end component;
 
 signal testCLK: STD_LOGIC := '0';
 signal testRST: STD_LOGIC := '1';
-signal init_addr : STD_LOGIC_VECTOR (7 downto 0) := X"00";
+signal addr : STD_LOGIC_VECTOR (7 downto 0) := X"00";
+signal cpt : STD_LOGIC_VECTOR (7 downto 0) := X"00";
+
 -- Clock period definitions
 -- Si 100 MHz
 constant Clock_period : time := 10 ns;
 
 begin
+
 Label_uut: Processor PORT MAP(
     CLK => testCLK,
     RST => testRST,
-    IP_ADDR => init_addr 
+    IP_ADDR => addr 
 );
 
 Clock_process : process
+    begin
+        testCLK <= not(testCLK);
+        wait for Clock_period/2;
+    end process;
+    
+    
+process(testCLK) is
 begin
-    testCLK <= not(testCLK);
-    wait for Clock_period/2;
+    if rising_edge(testCLK) then
+        if cpt <= X"FF" then
+            addr <= cpt;
+            cpt <= STD_LOGIC_VECTOR(unsigned(cpt) + 1);
+        else
+            testRST <= '0';
+            cpt <= X"00";
+            addr <= cpt;
+        end if;
+    end if;
 end process;
-
-testRST <= '0' after 500 ns;
-
+ 
 end Behavioral;
 
