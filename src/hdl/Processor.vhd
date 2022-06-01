@@ -118,8 +118,8 @@ begin
                    OUTPUT => out_im); 
                    
     PIPELINE_2 : RegisterBus
-        port map ( aA => LI_A(3 downto 0),
-                   aB => LI_B(3 downto 0),
+        port map ( aA => LI_B(3 downto 0),
+                   aB => LI_C(3 downto 0),
                    aW => MEM_A(3 downto 0),
                    W => out_LC_1,
                    DATA => MEM_B,
@@ -184,6 +184,9 @@ begin
            else "011" when DI_OP = X"04"; -- DIV
    out_MUX_4 <= LI_B when LI_OP = X"06" -- AFC
           else out_rbA;
+    
+    
+end Behavioral;
     
     
 end Behavioral;
